@@ -3,8 +3,8 @@
 > **Branch**: `flask_fastapi_todo_app_benchmarking`  
 > **Virtual Environment**: Single shared `~/.venvs/web-apis-env` (Python 3.15)  
 > **Database**: Shared SQLite `todos.db` (WAL mode)  
-> **Servers**: Flask (`0.0.0.0:5000`) & FastAPI (`0.0.0.0:8000`)  
-> **Swagger UI**: `http://127.0.0.1:5000/api/doc` & `http://127.0.0.1:8000/api/doc`
+> **Servers**: Flask (`0.0.0.0:8080`) & FastAPI (`0.0.0.0:8090`)  
+> **Swagger UI**: `http://127.0.0.1:8080/api/doc` & `http://127.0.0.1:8090/api/doc`
 
 ---
 
@@ -25,16 +25,16 @@
 - [x] **3.2** Create [`model/task_service.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/model/task_service.py) backed by shared SQLite `todos.db` (`WAL` mode)
 
 ### Phase 4: API Servers & Swagger UI (`/api/doc`)
-- [x] **4.1** Create [`fastapi_api_controller.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/fastapi_api_controller.py) (Port `8000` + Swagger UI at `/api/doc`)
-- [x] **4.2** Create [`flask_api_controller.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/flask_api_controller.py) (Port `5000` + Swagger UI at `/api/doc`)
+- [x] **4.1** Create [`fastapi_api_controller.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/fastapi_api_controller.py) (Port `8090` + Swagger UI at `/api/doc`)
+- [x] **4.2** Create [`flask_api_controller.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/flask_api_controller.py) (Port `8080` + Swagger UI at `/api/doc`)
 
 ### Phase 5: Parallel Execution & Multi-Core Benchmarking (`xargs -r -P`)
-- [x] **5.1** Create [`run_servers.sh`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/run_servers.sh) (launches Flask `:5000` & FastAPI `:8000` in parallel via `xargs -r -P 2`)
+- [x] **5.1** Create [`run_servers.sh`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/run_servers.sh) (launches Flask `:8080` & FastAPI `:8090` in parallel via `xargs -r -P 2`)
 - [x] **5.2** Create [`benchmark_parallel.sh`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/benchmark_parallel.sh) implementing the 4 Benchmark Test Scenarios (10 API calls each):
-  - **Test Scenario 1**: Sequential API calls (`-P 1`) to sequential API endpoint (`Flask :5000`)
-  - **Test Scenario 2**: Asynchronous/Simultaneous API calls (`xargs -r -P 10`) to sequential API endpoint (`Flask :5000`)
-  - **Test Scenario 3**: Sequential API calls (`-P 1`) to asynchronous API endpoint (`FastAPI :8000`)
-  - **Test Scenario 4**: Asynchronous/Simultaneous API calls (`xargs -r -P 10`) to asynchronous API endpoint (`FastAPI :8000`)
+  - **Test Scenario 1**: Sequential API calls (`-P 1`) to sequential API endpoint (`Flask :8080`)
+  - **Test Scenario 2**: Asynchronous/Simultaneous API calls (`xargs -r -P 10`) to sequential API endpoint (`Flask :8080`)
+  - **Test Scenario 3**: Sequential API calls (`-P 1`) to asynchronous API endpoint (`FastAPI :8090`)
+  - **Test Scenario 4**: Asynchronous/Simultaneous API calls (`xargs -r -P 10`) to asynchronous API endpoint (`FastAPI :8090`)
 
 ### Phase 6: Verification & Git Push
 - [x] **6.1** Verify endpoints, shared `todos.db` state, and Swagger UI (`/api/doc`)
@@ -50,8 +50,8 @@ web-apis-with-python/
 ├── PLAN.md                      # Master plan & live progress tracker
 ├── flask_requeriments.txt       # Flask dependencies (Python 3.15 compatible)
 ├── fastapi_requeriments.txt     # FastAPI dependencies (Python 3.15 compatible)
-├── flask_api_controller.py      # Flask Todo API controller (Port 5000, Swagger on /api/doc)
-├── fastapi_api_controller.py    # FastAPI Todo API controller (Port 8000, Swagger on /api/doc)
+├── flask_api_controller.py      # Flask Todo API controller (Port 8080, Swagger on /api/doc)
+├── fastapi_api_controller.py    # FastAPI Todo API controller (Port 8090, Swagger on /api/doc)
 ├── run_servers.sh               # Parallel launcher using xargs -r -P 2
 ├── benchmark_parallel.sh        # Multi-core parallel benchmark using xargs -r -P 4
 ├── todos.db                     # Shared SQLite database (auto-initialized, WAL mode)

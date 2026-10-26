@@ -14,8 +14,8 @@ fi
 TOTAL_CALLS="${1:-10}"
 PARALLEL_WORKERS="${2:-10}"
 
-FLASK_URL="http://127.0.0.1:5000"
-FASTAPI_URL="http://127.0.0.1:8000"
+FLASK_URL="http://127.0.0.1:8080"
+FASTAPI_URL="http://127.0.0.1:8090"
 
 # Generate numbers 1..TOTAL_CALLS
 generate_calls() {
@@ -86,7 +86,7 @@ run_target() {
 }
 
 echo "################################################################################"
-echo "# Flask (:5000) vs FastAPI (:8000) — Applying All 4 Scenarios to Each Server"
+echo "# Flask (:8080) vs FastAPI (:8090) — Applying All 4 Scenarios to Each Server"
 echo "# Calls per test: $TOTAL_CALLS | Simultaneous workers: $PARALLEL_WORKERS"
 echo "################################################################################"
 
@@ -97,8 +97,8 @@ echo ""
 echo "================================================================================"
 echo " Test Scenario 1: Sequential API calls (-P 1) -> Sequential API endpoint (/api/seq)"
 echo "================================================================================"
-run_target "S1_FLASK_MS"   "Flask   (:5000)" "$FLASK_URL/api/seq"   1 "S1-Flask-Seq"
-run_target "S1_FASTAPI_MS" "FastAPI (:8000)" "$FASTAPI_URL/api/seq" 1 "S1-FastAPI-Seq"
+run_target "S1_FLASK_MS"   "Flask   (:8080)" "$FLASK_URL/api/seq"   1 "S1-Flask-Seq"
+run_target "S1_FASTAPI_MS" "FastAPI (:8090)" "$FASTAPI_URL/api/seq" 1 "S1-FastAPI-Seq"
 
 # ==============================================================================
 # Test Scenario 2: Asynchronous API calls to sequential API endpoint
@@ -107,8 +107,8 @@ echo ""
 echo "================================================================================"
 echo " Test Scenario 2: Asynchronous API calls (xargs -P $PARALLEL_WORKERS) -> Sequential API endpoint (/api/seq)"
 echo "================================================================================"
-run_target "S2_FLASK_MS"   "Flask   (:5000)" "$FLASK_URL/api/seq"   "$PARALLEL_WORKERS" "S2-Flask-Seq"
-run_target "S2_FASTAPI_MS" "FastAPI (:8000)" "$FASTAPI_URL/api/seq" "$PARALLEL_WORKERS" "S2-FastAPI-Seq"
+run_target "S2_FLASK_MS"   "Flask   (:8080)" "$FLASK_URL/api/seq"   "$PARALLEL_WORKERS" "S2-Flask-Seq"
+run_target "S2_FASTAPI_MS" "FastAPI (:8090)" "$FASTAPI_URL/api/seq" "$PARALLEL_WORKERS" "S2-FastAPI-Seq"
 
 # ==============================================================================
 # Test Scenario 3: Sequential API calls to asynchronous API endpoint
@@ -117,8 +117,8 @@ echo ""
 echo "================================================================================"
 echo " Test Scenario 3: Sequential API calls (-P 1) -> Asynchronous API endpoint (/api/async)"
 echo "================================================================================"
-run_target "S3_FLASK_MS"   "Flask   (:5000)" "$FLASK_URL/api/async"   1 "S3-Flask-Async"
-run_target "S3_FASTAPI_MS" "FastAPI (:8000)" "$FASTAPI_URL/api/async" 1 "S3-FastAPI-Async"
+run_target "S3_FLASK_MS"   "Flask   (:8080)" "$FLASK_URL/api/async"   1 "S3-Flask-Async"
+run_target "S3_FASTAPI_MS" "FastAPI (:8090)" "$FASTAPI_URL/api/async" 1 "S3-FastAPI-Async"
 
 # ==============================================================================
 # Test Scenario 4: Asynchronous API calls to asynchronous API endpoint
@@ -127,14 +127,14 @@ echo ""
 echo "================================================================================"
 echo " Test Scenario 4: Asynchronous API calls (xargs -P $PARALLEL_WORKERS) -> Asynchronous API endpoint (/api/async)"
 echo "================================================================================"
-run_target "S4_FLASK_MS"   "Flask   (:5000)" "$FLASK_URL/api/async"   "$PARALLEL_WORKERS" "S4-Flask-Async"
-run_target "S4_FASTAPI_MS" "FastAPI (:8000)" "$FASTAPI_URL/api/async" "$PARALLEL_WORKERS" "S4-FastAPI-Async"
+run_target "S4_FLASK_MS"   "Flask   (:8080)" "$FLASK_URL/api/async"   "$PARALLEL_WORKERS" "S4-Flask-Async"
+run_target "S4_FASTAPI_MS" "FastAPI (:8090)" "$FASTAPI_URL/api/async" "$PARALLEL_WORKERS" "S4-FastAPI-Async"
 
 echo ""
 echo "================================================================================"
 echo " BENCHMARK SUMMARY: All 4 Scenarios Applied to Each Server ($TOTAL_CALLS calls each)"
 echo "================================================================================"
-printf " %-48s | %12s | %12s\n" "Test Scenario" "Flask :5000" "FastAPI :8000"
+printf " %-48s | %12s | %12s\n" "Test Scenario" "Flask :8080" "FastAPI :8090"
 echo "--------------------------------------------------------------------------------"
 printf " %-48s | %9s ms | %9s ms\n" "Scenario 1: Sequential calls -> Sequential API" "$S1_FLASK_MS" "$S1_FASTAPI_MS"
 printf " %-48s | %9s ms | %9s ms\n" "Scenario 2: Async calls      -> Sequential API" "$S2_FLASK_MS" "$S2_FASTAPI_MS"

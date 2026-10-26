@@ -38,10 +38,10 @@ fi
 export PYTHONUNBUFFERED=1
 
 echo "============================================================"
-echo " Flask   (Sync,  Debug=ON) : http://127.0.0.1:5000/api/tasks"
-echo " Flask   Swagger UI        : http://127.0.0.1:5000/api/doc"
-echo " FastAPI (Async, Debug=ON) : http://127.0.0.1:8000/api/tasks"
-echo " FastAPI Swagger UI        : http://127.0.0.1:8000/api/doc"
+echo " Flask   (Sync,  Debug=ON) : http://127.0.0.1:8080/api/tasks"
+echo " Flask   Swagger UI        : http://127.0.0.1:8080/api/doc"
+echo " FastAPI (Async, Debug=ON) : http://127.0.0.1:8090/api/tasks"
+echo " FastAPI Swagger UI        : http://127.0.0.1:8090/api/doc"
 echo " Shared SQLite DB (Local)  : ${TASK_SERVICE_DB_PATH:-/tmp/web-apis-with-python-benchmark/todos.db}"
 echo "============================================================"
 

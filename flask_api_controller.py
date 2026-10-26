@@ -7,17 +7,17 @@ import model.task_service as task_service
 
 
 class ServerTagFormatter(logging.Formatter):
-    """Prefix every Flask / Werkzeug log entry with [FLASK :5000]."""
+    """Prefix every Flask / Werkzeug log entry with [FLASK :8080]."""
 
     def format(self, record: logging.LogRecord) -> str:
         msg = super().format(record)
         return "\n".join(
-            f"\033[1;36m[FLASK   :5000]\033[0m {line}" for line in msg.splitlines()
+            f"\033[1;36m[FLASK   :8080]\033[0m {line}" for line in msg.splitlines()
         )
 
 
 def configure_flask_logging() -> None:
-    """Attach the [FLASK :5000] formatter to Werkzeug and root loggers."""
+    """Attach the [FLASK :8080] formatter to Werkzeug and root loggers."""
     handler = logging.StreamHandler()
     handler.setFormatter(ServerTagFormatter("%(message)s"))
     werkzeug_logger = logging.getLogger("werkzeug")
@@ -166,4 +166,4 @@ if __name__ == "__main__":
     flask.cli.show_server_banner = lambda *args, **kwargs: logging.getLogger(
         "werkzeug"
     ).info(" * Serving Flask app 'flask_api_controller'\n * Debug mode: on")
-    app.run(host="0.0.0.0", port=5000, debug=True, threaded=False, use_reloader=False)
+    app.run(host="0.0.0.0", port=8080, debug=True, threaded=False, use_reloader=False)
