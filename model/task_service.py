@@ -1,24 +1,58 @@
 import asyncio
 import os
+import shutil
 import sqlite3
+import tempfile
 import time
 from typing import List, Optional, Union
 from model.model import ID, Task, TaskList
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, "todos.db")
+SOURCE_DB_PATH = os.path.join(BASE_DIR, "todos.db")
+
+
+def _resolve_db_path() -> str:
+    """
+    Use a local filesystem path (/tmp/web-apis-with-python-benchmark/todos.db) by default
+    so SQLite WAL shared-memory locking (.db-shm / .db-wal) never fails with
+    'sqlite3.OperationalError: locking protocol' when the project resides on an
+    SMB/CIFS or WSL drvfs network mount.
+    """
+    env_db = os.environ.get("TASK_SERVICE_DB_PATH") or os.environ.get("TASKMAN_DB_PATH")
+    if env_db:
+        return env_db
+
+    local_dir = os.path.join(tempfile.gettempdir(), "web-apis-with-python-benchmark")
+    os.makedirs(local_dir, exist_ok=True)
+    local_db = os.path.join(local_dir, "todos.db")
+
+    if not os.path.exists(local_db) and os.path.exists(SOURCE_DB_PATH):
+        try:
+            shutil.copy2(SOURCE_DB_PATH, local_db)
+        except OSError:
+            pass
+
+    return local_db
+
+
+DB_PATH = _resolve_db_path()
 
 # Simulated I/O latency (seconds) to make synchronous blocking vs async non-blocking visible
-IO_DELAY = float(os.environ.get("TASKMAN_IO_DELAY", "0.05"))
+IO_DELAY = float(
+    os.environ.get("TASK_SERVICE_IO_DELAY", os.environ.get("TASKMAN_IO_DELAY", "0.05"))
+)
 
 
 def _get_connection() -> sqlite3.Connection:
     """Create a SQLite connection to todos.db configured with WAL mode for concurrency."""
     conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout=30000;")
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+    except sqlite3.OperationalError:
+        conn.execute("PRAGMA journal_mode=MEMORY;")
     conn.execute("PRAGMA synchronous=NORMAL;")
-    conn.execute("PRAGMA busy_timeout=5000;")
     return conn
 
 

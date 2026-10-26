@@ -22,11 +22,11 @@
 
 ### Phase 3: Top-Down Model & SQLite Persistence Layer (`model/` + `todos.db`)
 - [x] **3.1** Create [`model/__init__.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/model/__init__.py) and [`model/model.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/model/model.py) (`ID`, `Task`, `TaskList`)
-- [x] **3.2** Create [`model/taskman.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/model/taskman.py) backed by shared SQLite `todos.db` (`WAL` mode)
+- [x] **3.2** Create [`model/task_service.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/model/task_service.py) backed by shared SQLite `todos.db` (`WAL` mode)
 
 ### Phase 4: API Servers & Swagger UI (`/api/doc`)
-- [x] **4.1** Create [`fastapi_api_srv.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/fastapi_api_srv.py) (Port `8000` + Swagger UI at `/api/doc`)
-- [x] **4.2** Create [`flask_api_srv.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/flask_api_srv.py) (Port `5000` + Swagger UI at `/api/doc`)
+- [x] **4.1** Create [`fastapi_api_controller.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/fastapi_api_controller.py) (Port `8000` + Swagger UI at `/api/doc`)
+- [x] **4.2** Create [`flask_api_controller.py`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/flask_api_controller.py) (Port `5000` + Swagger UI at `/api/doc`)
 
 ### Phase 5: Parallel Execution & Multi-Core Benchmarking (`xargs -r -P`)
 - [x] **5.1** Create [`run_servers.sh`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/run_servers.sh) (launches Flask `:5000` & FastAPI `:8000` in parallel via `xargs -r -P 2`)
@@ -50,8 +50,8 @@ web-apis-with-python/
 ├── PLAN.md                      # Master plan & live progress tracker
 ├── flask_requeriments.txt       # Flask dependencies (Python 3.15 compatible)
 ├── fastapi_requeriments.txt     # FastAPI dependencies (Python 3.15 compatible)
-├── flask_api_srv.py             # Flask Todo API server (Port 5000, Swagger on /api/doc)
-├── fastapi_api_srv.py           # FastAPI Todo API server (Port 8000, Swagger on /api/doc)
+├── flask_api_controller.py      # Flask Todo API controller (Port 5000, Swagger on /api/doc)
+├── fastapi_api_controller.py    # FastAPI Todo API controller (Port 8000, Swagger on /api/doc)
 ├── run_servers.sh               # Parallel launcher using xargs -r -P 2
 ├── benchmark_parallel.sh        # Multi-core parallel benchmark using xargs -r -P 4
 ├── todos.db                     # Shared SQLite database (auto-initialized, WAL mode)
@@ -59,7 +59,7 @@ web-apis-with-python/
 │   ├── __init__.py
 │   ├── model.py                 # Pydantic models: ID, Task, TaskList
 │   ├── swagger.py               # OpenAPI 3.0 spec & Swagger UI template for Flask
-│   └── taskman.py               # Top-down task handler using SQLite todos.db
+│   └── task_service.py          # Top-down task service using SQLite todos.db
 └── env/                         # Single shared Python virtual environment
 ```
 
@@ -99,7 +99,7 @@ class TaskList(BaseModel):
     task: Task
 ```
 
-### 3.3 Top-Down Task Handler (`model/taskman.py` + `todos.db`)
+### 3.3 Top-Down Task Service (`model/task_service.py` + `todos.db`)
 Replaces the JSON file backend with SQLite (`todos.db`) while preserving the exact route handler interface:
 
 | Function Signature | Behavior |
@@ -109,14 +109,14 @@ Replaces the JSON file backend with SQLite (`todos.db`) while preserving the exa
 | `async def update_task(id: int, new_task: Task)` | Update `summary` & `priority` for `id` in `todos.db` and return updated `TaskList` |
 | `async def delete_task(id: int)` | Delete task `id` from `todos.db` and return confirmation with `id` |
 
-### 3.4 API Endpoints & Swagger UI (`flask_api_srv.py` & `fastapi_api_srv.py`)
+### 3.4 API Endpoints & Swagger UI (`flask_api_controller.py` & `fastapi_api_controller.py`)
 
 | Method | Route | Handler Call | Description |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/doc` | Swagger UI | Interactive OpenAPI / Swagger UI documentation |
 | `GET` | `/api/openapi.json` | OpenAPI Schema | OpenAPI 3.0 JSON specification |
-| `GET` | `/api/tasks` | `await taskman.get_tasks()` | Fetch the list of all tasks |
-| `GET` | `/api/tasks/{id}` | `await taskman.get_tasks(id)` | Fetch a single task by `id` |
-| `POST` | `/api/tasks/create` | `await taskman.create_task(task)` | Create a new task and return its details with `id` |
-| `PUT` | `/api/tasks/{id}/update` | `await taskman.update_task(id, task)` | Update a specific task by `id` and return updated task |
-| `DELETE` | `/api/tasks/{id}/delete` | `await taskman.delete_task(id)` | Delete the task by `id` and return confirmation |
+| `GET` | `/api/tasks` | `await task_service.get_tasks()` | Fetch the list of all tasks |
+| `GET` | `/api/tasks/{id}` | `await task_service.get_tasks(id)` | Fetch a single task by `id` |
+| `POST` | `/api/tasks/create` | `await task_service.create_task(task)` | Create a new task and return its details with `id` |
+| `PUT` | `/api/tasks/{id}/update` | `await task_service.update_task(id, task)` | Update a specific task by `id` and return updated task |
+| `DELETE` | `/api/tasks/{id}/delete` | `await task_service.delete_task(id)` | Delete the task by `id` and return confirmation |

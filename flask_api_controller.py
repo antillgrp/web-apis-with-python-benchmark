@@ -3,7 +3,7 @@ from flask import Flask, Response, jsonify, request
 from pydantic import ValidationError
 from model.model import Task, TaskList
 from model.swagger import OPENAPI_SPEC, SWAGGER_UI_HTML
-import model.taskman as taskman
+import model.task_service as task_service
 
 
 class ServerTagFormatter(logging.Formatter):
@@ -52,7 +52,7 @@ def swagger_ui():
 @app.get("/api/seq/tasks")
 def get_tasks_seq():
     """Fetch the list of all tasks (Sequential/Synchronous endpoint)."""
-    tasks = taskman.get_tasks_sync()
+    tasks = task_service.get_tasks_sync()
     return jsonify(tasks)
 
 
@@ -60,7 +60,7 @@ def get_tasks_seq():
 @app.get("/api/seq/tasks/<int:id>")
 def get_task_seq(id: int):
     """Fetch the task by id (Sequential/Synchronous endpoint)."""
-    task = taskman.get_tasks_sync(id)
+    task = task_service.get_tasks_sync(id)
     if task is None:
         return jsonify({"detail": f"Task {id} not found"}), 404
     return jsonify(task)
@@ -76,7 +76,7 @@ def create_task_seq():
     except ValidationError as exc:
         return jsonify({"detail": exc.errors()}), 422
 
-    created = taskman.create_task_sync(task)
+    created = task_service.create_task_sync(task)
     return jsonify(created)
 
 
@@ -90,7 +90,7 @@ def update_task_seq(id: int):
     except ValidationError as exc:
         return jsonify({"detail": exc.errors()}), 422
 
-    updated = taskman.update_task_sync(id, task)
+    updated = task_service.update_task_sync(id, task)
     if updated is None:
         return jsonify({"detail": f"Task {id} not found"}), 404
     return jsonify(updated)
@@ -100,7 +100,7 @@ def update_task_seq(id: int):
 @app.delete("/api/seq/tasks/<int:id>/delete")
 def delete_task_seq(id: int):
     """Delete the task by id and return confirmation (Sequential/Synchronous endpoint)."""
-    result = taskman.delete_task_sync(id)
+    result = task_service.delete_task_sync(id)
     return jsonify(result)
 
 
@@ -111,14 +111,14 @@ def delete_task_seq(id: int):
 @app.get("/api/async/tasks")
 async def get_tasks_async():
     """Fetch the list of all tasks (Asynchronous route on Flask)."""
-    tasks = await taskman.get_tasks()
+    tasks = await task_service.get_tasks()
     return jsonify(tasks)
 
 
 @app.get("/api/async/tasks/<int:id>")
 async def get_task_async(id: int):
     """Fetch the task by id (Asynchronous route on Flask)."""
-    task = await taskman.get_tasks(id)
+    task = await task_service.get_tasks(id)
     if task is None:
         return jsonify({"detail": f"Task {id} not found"}), 404
     return jsonify(task)
@@ -133,7 +133,7 @@ async def create_task_async():
     except ValidationError as exc:
         return jsonify({"detail": exc.errors()}), 422
 
-    created = await taskman.create_task(task)
+    created = await task_service.create_task(task)
     return jsonify(created)
 
 
@@ -146,7 +146,7 @@ async def update_task_async(id: int):
     except ValidationError as exc:
         return jsonify({"detail": exc.errors()}), 422
 
-    updated = await taskman.update_task(id, task)
+    updated = await task_service.update_task(id, task)
     if updated is None:
         return jsonify({"detail": f"Task {id} not found"}), 404
     return jsonify(updated)
@@ -155,7 +155,7 @@ async def update_task_async(id: int):
 @app.delete("/api/async/tasks/<int:id>/delete")
 async def delete_task_async(id: int):
     """Delete the task by id and return confirmation (Asynchronous route on Flask)."""
-    result = await taskman.delete_task(id)
+    result = await task_service.delete_task(id)
     return jsonify(result)
 
 
@@ -165,5 +165,5 @@ if __name__ == "__main__":
 
     flask.cli.show_server_banner = lambda *args, **kwargs: logging.getLogger(
         "werkzeug"
-    ).info(" * Serving Flask app 'flask_api_srv'\n * Debug mode: on")
+    ).info(" * Serving Flask app 'flask_api_controller'\n * Debug mode: on")
     app.run(host="0.0.0.0", port=5000, debug=True, threaded=False, use_reloader=False)

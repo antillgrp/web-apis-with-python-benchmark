@@ -12,8 +12,8 @@ web-apis-with-python/
 ├── PLAN.md                      # Master project plan & progress tracker
 ├── flask_requeriments.txt       # Flask dependencies
 ├── fastapi_requeriments.txt     # FastAPI dependencies
-├── flask_api_srv.py             # Sequential Flask Todo API server (Port 5000)
-├── fastapi_api_srv.py           # Asynchronous FastAPI Todo API server (Port 8000)
+├── flask_api_controller.py      # Sequential Flask Todo API controller (Port 5000)
+├── fastapi_api_controller.py    # Asynchronous FastAPI Todo API controller (Port 8000)
 ├── run_servers.sh               # Parallel server launcher (xargs -r -P 2)
 ├── benchmark_parallel.sh        # 4-Scenario benchmark suite (xargs -r -P)
 ├── todos.db                     # Shared SQLite database (WAL mode, auto-created)
@@ -21,7 +21,7 @@ web-apis-with-python/
     ├── __init__.py
     ├── model.py                 # Pydantic models: ID, Task, TaskList
     ├── swagger.py               # OpenAPI 3.0 spec & Swagger UI HTML for Flask
-    └── taskman.py               # Top-down task handler for SQLite (sync & async)
+    └── task_service.py          # Top-down task service for SQLite (sync & async)
 ```
 
 ---
@@ -66,7 +66,7 @@ Press `Ctrl+C` to stop both servers together.
 #### 1. Run the Flask Server (Sequential API on Port `5000`)
 ```bash
 source ~/.venvs/web-apis-env/bin/activate
-python flask_api_srv.py
+python flask_api_controller.py
 ```
 - **Base URL**: `http://127.0.0.1:5000`
 - **Swagger UI**: `http://127.0.0.1:5000/api/doc`
@@ -75,9 +75,9 @@ python flask_api_srv.py
 #### 2. Run the FastAPI Server (Asynchronous API on Port `8000`)
 ```bash
 source ~/.venvs/web-apis-env/bin/activate
-python fastapi_api_srv.py
+python fastapi_api_controller.py
 # Or directly with uvicorn:
-uvicorn fastapi_api_srv:app --host 0.0.0.0 --port 8000
+uvicorn fastapi_api_controller:app --host 0.0.0.0 --port 8000
 ```
 - **Base URL**: `http://127.0.0.1:8000`
 - **Swagger UI**: `http://127.0.0.1:8000/api/doc`
@@ -133,8 +133,8 @@ curl -X DELETE http://127.0.0.1:5000/api/tasks/1/delete
 The benchmark script ([`benchmark_parallel.sh`](file:///home/toor/DEVOPS_DEV/web-apis-with-python/benchmark_parallel.sh)) applies **all 4 Test Scenarios to each server** (**Flask on port `5000`** and **FastAPI on port `8000`**) against the shared SQLite database (`todos.db`).
 
 Both servers expose:
-- **Sequential (Synchronous) API endpoints**: `/api/seq/tasks/*` (uses synchronous blocking `taskman.*_sync`)
-- **Asynchronous API endpoints**: `/api/async/tasks/*` (uses non-blocking `await taskman.*`)
+- **Sequential (Synchronous) API endpoints**: `/api/seq/tasks/*` (uses synchronous blocking `task_service.*_sync`)
+- **Asynchronous API endpoints**: `/api/async/tasks/*` (uses non-blocking `await task_service.*`)
 
 For every single iteration (`1..10`), a client worker performs a 3-step CRUD workflow:
 1. **`POST .../tasks/create`** — Creates a new task in `todos.db` and captures its `id`.

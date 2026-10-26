@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 from fastapi.encoders import jsonable_encoder
 from model.model import Task, TaskList
-import model.taskman as taskman
+import model.task_service as task_service
 import uvicorn
 from uvicorn.config import LOGGING_CONFIG
 
@@ -26,7 +26,7 @@ app = FastAPI(
 @app.get("/api/async/tasks")
 async def get_tasks():
     """Fetch the list of all tasks (Asynchronous non-blocking endpoint)."""
-    tasks = await taskman.get_tasks()
+    tasks = await task_service.get_tasks()
     return jsonable_encoder(tasks)
 
 
@@ -34,7 +34,7 @@ async def get_tasks():
 @app.get("/api/async/tasks/{id}")
 async def get_task(id: int):
     """Fetch the task by id (Asynchronous non-blocking endpoint)."""
-    task = await taskman.get_tasks(id)
+    task = await task_service.get_tasks(id)
     if task is None:
         raise HTTPException(status_code=404, detail=f"Task {id} not found")
     return jsonable_encoder(task)
@@ -44,7 +44,7 @@ async def get_task(id: int):
 @app.post("/api/async/tasks/create")
 async def create_task(task: Task):
     """Create a new task and return its details (Asynchronous non-blocking endpoint)."""
-    created = await taskman.create_task(task)
+    created = await task_service.create_task(task)
     return jsonable_encoder(created)
 
 
@@ -52,7 +52,7 @@ async def create_task(task: Task):
 @app.put("/api/async/tasks/{id}/update")
 async def update_task(id: int, task: Task):
     """Update the task by id and return the updated task (Asynchronous non-blocking endpoint)."""
-    updated = await taskman.update_task(id, task)
+    updated = await task_service.update_task(id, task)
     if updated is None:
         raise HTTPException(status_code=404, detail=f"Task {id} not found")
     return jsonable_encoder(updated)
@@ -62,7 +62,7 @@ async def update_task(id: int, task: Task):
 @app.delete("/api/async/tasks/{id}/delete")
 async def delete_task(id: int):
     """Delete the task by id and return confirmation (Asynchronous non-blocking endpoint)."""
-    result = await taskman.delete_task(id)
+    result = await task_service.delete_task(id)
     return jsonable_encoder(result)
 
 
@@ -73,14 +73,14 @@ async def delete_task(id: int):
 @app.get("/api/seq/tasks")
 async def get_tasks_seq():
     """Fetch the list of all tasks (Sequential blocking endpoint on FastAPI)."""
-    tasks = taskman.get_tasks_sync()
+    tasks = task_service.get_tasks_sync()
     return jsonable_encoder(tasks)
 
 
 @app.get("/api/seq/tasks/{id}")
 async def get_task_seq(id: int):
     """Fetch the task by id (Sequential blocking endpoint on FastAPI)."""
-    task = taskman.get_tasks_sync(id)
+    task = task_service.get_tasks_sync(id)
     if task is None:
         raise HTTPException(status_code=404, detail=f"Task {id} not found")
     return jsonable_encoder(task)
@@ -89,14 +89,14 @@ async def get_task_seq(id: int):
 @app.post("/api/seq/tasks/create")
 async def create_task_seq(task: Task):
     """Create a new task and return its details (Sequential blocking endpoint on FastAPI)."""
-    created = taskman.create_task_sync(task)
+    created = task_service.create_task_sync(task)
     return jsonable_encoder(created)
 
 
 @app.put("/api/seq/tasks/{id}/update")
 async def update_task_seq(id: int, task: Task):
     """Update the task by id and return the updated task (Sequential blocking endpoint on FastAPI)."""
-    updated = taskman.update_task_sync(id, task)
+    updated = task_service.update_task_sync(id, task)
     if updated is None:
         raise HTTPException(status_code=404, detail=f"Task {id} not found")
     return jsonable_encoder(updated)
@@ -105,7 +105,7 @@ async def update_task_seq(id: int, task: Task):
 @app.delete("/api/seq/tasks/{id}/delete")
 async def delete_task_seq(id: int):
     """Delete the task by id and return confirmation (Sequential blocking endpoint on FastAPI)."""
-    result = taskman.delete_task_sync(id)
+    result = task_service.delete_task_sync(id)
     return jsonable_encoder(result)
 
 
@@ -123,7 +123,7 @@ def get_uvicorn_log_config() -> dict:
 if __name__ == "__main__":
     # Run FastAPI asynchronously in debug mode on browser-safe port 8000
     print(
-        "\033[1;32m[FASTAPI :8000]\033[0m  * Serving FastAPI app 'fastapi_api_srv' (Debug mode: on)",
+        "\033[1;32m[FASTAPI :8000]\033[0m  * Serving FastAPI app 'fastapi_api_controller' (Debug mode: on)",
         flush=True,
     )
     print(
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         flush=True,
     )
     uvicorn.run(
-        "fastapi_api_srv:app",
+        "fastapi_api_controller:app",
         host="0.0.0.0",
         port=8000,
         reload=False,
